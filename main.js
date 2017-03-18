@@ -37,49 +37,136 @@ $.ajax({
 });
 
 function setEventHandlers(){
-	$("#selection").click(function(){
-		var queue = [];
-		var array = pokemonToSort.slice();
-		for (var i = 0; i<array.length; i++){
-			var minIndex = i;
-			for (var j = i+1; j<array.length; j++){
-				queue.push(["compare", minIndex, j]);
-				if (array[j].height < array[minIndex].height){
-					minIndex = j;
+	$button1 = $("#selection");
+	$button1.click(function(){
+		if ($button1.hasClass("red")){
+			$button1.removeClass("red");
+			$button1.addClass("orange");
+			var queue = [];
+			var array = pokemonToSort.slice();
+			for (var i = 0; i<array.length; i++){
+				var minIndex = i;
+				for (var j = i+1; j<array.length; j++){
+					queue.push(["compare", minIndex, j]);
+					if (array[j].height < array[minIndex].height){
+						minIndex = j;
+					}
+				} 
+				if (minIndex != i){
+					queue.push(["swap", i, minIndex]);
+					var temp = array[i];
+					array[i] = array[minIndex];
+					array[minIndex] = temp;
 				}
-			} 
-			if (minIndex != i){
-				queue.push(["swap", i, minIndex]);
-				var temp = array[i];
-				array[i] = array[minIndex];
-				array[minIndex] = temp;
 			}
+			array = pokemonToSort.slice();
+			displayQueue(1, array, queue, $button1);
 		}
-		array = pokemonToSort.slice();
-		displayQueue(1, array, queue, $('#selection'));
 	});
-	$("#insertion").click(function(){
-		setTableRow(pokemonToSort, 2);
-		var queue = [];
-		var j = 0;
-		var array = pokemonToSort.slice();
-		for (var i = 0; i<array.length; i++){
-			j = i;
-			while (j>0 && array[j].height < array[j-1].height){
-				queue.push(["compare", j, j-1]);
-				var temp = array[j];
-				array[j] = array[j-1];
-				array[j-1] = temp;
-				queue.push(["swap", j, j-1]);
-				j--;
+	$button2 = $("#insertion");
+	$button2.click(function(){
+		$button2 = $("#insertion");
+		if ($button2.hasClass("red")){
+			$button2.removeClass("red");
+			$button2.addClass("orange");
+			setTableRow(pokemonToSort, 2);
+			var queue = [];
+			var j = 0;
+			var array = pokemonToSort.slice();
+			for (var i = 0; i<array.length; i++){
+				j = i;
+				while (j>0 && array[j].height < array[j-1].height){
+					queue.push(["compare", j, j-1]);
+					var temp = array[j];
+					array[j] = array[j-1];
+					array[j-1] = temp;
+					queue.push(["swap", j, j-1]);
+					j--;
+				}
+				if (j>0){
+					queue.push(["compare", j, j-1]);
+				}
 			}
-			if (j>0){
-				queue.push(["compare", j, j-1]);
-			}
+			array = pokemonToSort.slice();
+			displayQueue(2, array, queue, $button2);
 		}
-		array = pokemonToSort.slice();
-		displayQueue(2, array, queue, $('#insertion'));
 	});
+	$button3 = $("#bubble");
+	$button3.click(function(){
+		if ($button3.hasClass("red")){
+			$button3.removeClass("red");
+			$button3.addClass("orange");
+			setTableRow(pokemonToSort, 3);
+			var queue = [];
+			var array = pokemonToSort.slice();
+			for (var i = 0; i<array.length-1; i++){
+				for (var j = 0; j<array.length-i-1; j++){
+					queue.push(["compare", j, j+1]);
+					if (array[j].height > array[j+1].height){
+						queue.push(["swap", j, j+1]);
+						var temp = array[j];
+						array[j] = array[j+1];
+						array[j+1] = temp;
+					}
+				}
+			}
+			array = pokemonToSort.slice();
+			displayQueue(3, array, queue, $button3);
+		}
+	});
+	$button4 = $("#quick");
+	$button4.click(function(){
+		if ($button4.hasClass("red")){
+			$button4.removeClass("red");
+			$button4.addClass("orange");
+			setTableRow(pokemonToSort, 4);
+			var queue = [];
+			var array = pokemonToSort.slice();
+			quickSort(queue, array, 0, array.length-1);
+			array = pokemonToSort.slice();
+			displayQueue(4, array, queue, $button4);
+		}
+	});
+	$button5 = $("#all");
+	$button5.click(function(){
+		if ($button1.hasClass("red") && $button2.hasClass("red") && $button3.hasClass("red") && $button4.hasClass("red")){
+			$button1.click();
+			$button2.click();
+			$button3.click();
+			$button4.click();
+		}
+	});
+}
+
+function quickSort(queue, array, left, right){
+	var i = left, j = right;
+	var pivot = parseInt((left+right)/2);
+	while(i<=j){
+		while (array[i].height < array[pivot].height){
+			queue.push(["compare", i, pivot]);
+			i++;
+		}
+		queue.push(["compare", i, pivot]);
+		while (array[j].height > array[pivot].height){
+			queue.push(["compare", j, pivot]);
+			j--;
+		}
+		queue.push(["compare", j, pivot]);
+		if (i<=j){
+			var temp = array[i];
+			array[i] = array[j];
+			array[j] = temp;
+			queue.push(["swap", i, j]);
+			i++;
+			j--;
+		}
+	}
+	if (left < j){
+		quickSort(queue, array, left, j);
+	}
+	if (right > i){
+		quickSort(queue, array, i, right);
+	}
 }
 
 function displayQueue(index, array, queue, $button){
@@ -106,7 +193,7 @@ function displayQueue(index, array, queue, $button){
 			if (queue.length == 0){
 				clearInterval(t)
 				setTableRow(array, index);
-				$button.removeClass("red");
+				$button.removeClass("orange");
 				$button.addClass("green");
 			}
 		}, 200);

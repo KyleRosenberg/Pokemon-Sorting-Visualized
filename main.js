@@ -7,7 +7,7 @@ function getRandomPokemon(array){
 	var pickedindecies = [];
 	for (var i = 0; i<14; i++){
 		var index = parseInt(Math.random()*array.length);
-		while (containsHeight(pickedindecies, pokemonjson[index].height)){
+		while (containsHeight(pickedindecies, array[index].height)){
 			var index = parseInt(Math.random()*array.length);
 		}
 		pickedindecies.push(index);
@@ -33,7 +33,7 @@ function setTableRow(array, row){
 		var name = array[i].species.name;
 		name = name.substr(0, 1).toUpperCase() + name.substr(1);
 		$element.css("background-color", "white");
-		$element.html('<div class="ui tiny image"><image style="max-width:100%;" src='+array[i].sprites.front_default+'/><br/>' + name + ': ' + (array[i].height/10) + 'm' + '</div>');
+		$element.html('<div class="ui tiny image"><image style="max-width:100%;" src='+array[i].sprites.front_default+'/><br/>' + name + ':<br/>' + (array[i].height/10) + 'm' + '</div>');
 	}
 }
 

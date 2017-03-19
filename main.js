@@ -1,12 +1,13 @@
 var pokemonjsonurl = "https://raw.githubusercontent.com/KyleRosenberg/PokemonTeamBuilder/master/pokemon.j";
 
 var pokemonToSort = [];
+var pokemonjson;
 
 function getRandomPokemon(array){
 	var pickedindecies = [];
 	for (var i = 0; i<14; i++){
 		var index = parseInt(Math.random()*array.length);
-		while (pickedindecies.indexOf(index)!=-1){
+		while (containsHeight(pickedindecies, pokemonjson[index].height)){
 			var index = parseInt(Math.random()*array.length);
 		}
 		pickedindecies.push(index);
@@ -15,6 +16,15 @@ function getRandomPokemon(array){
 		pokemonToSort.push(array[pickedindecies[i]]);
 	}
 	setTableRow(pokemonToSort, 0);
+}
+
+function containsHeight(a, h){
+	for (var i = 0; i<a.length; i++){
+		if (pokemonjson[a[i]].height == h){
+			return true;
+		}
+	}
+	return false;
 }
 
 function setTableRow(array, row){
@@ -139,34 +149,33 @@ function setEventHandlers(){
 }
 
 function quickSort(queue, array, left, right){
-	var i = left, j = right;
-	var pivot = parseInt((left+right)/2);
-	while(i<=j){
-		while (array[i].height < array[pivot].height){
-			queue.push(["compare", i, pivot]);
-			i++;
-		}
-		queue.push(["compare", i, pivot]);
-		while (array[j].height > array[pivot].height){
+	if (left<right){
+		p = partition(queue, array, left, right);
+		quickSort(queue, array, left, p-1);
+		quickSort(queue, array, p+1, right);
+	}
+}
+
+function partition(queue, array, left, right){
+	pivot = right;
+	i = left-1;
+	for (var j = left; j<right; j++){
+		if (j>=i){
 			queue.push(["compare", j, pivot]);
-			j--;
-		}
-		queue.push(["compare", j, pivot]);
-		if (i<=j){
-			var temp = array[i];
-			array[i] = array[j];
-			array[j] = temp;
-			queue.push(["swap", i, j]);
-			i++;
-			j--;
+			if (array[j].height < array[pivot].height){
+				i++;
+				queue.push(["swap", i, j]);
+				temp = array[i];
+				array[i] = array[j];
+				array[j] = temp;
+			}
 		}
 	}
-	if (left < j){
-		quickSort(queue, array, left, j);
-	}
-	if (right > i){
-		quickSort(queue, array, i, right);
-	}
+	queue.push(["swap", i+1, right]);
+	temp = array[i+1];
+	array[i+1] = array[right];
+	array[right] = temp;
+	return i+1;
 }
 
 function displayQueue(index, array, queue, $button){
@@ -181,13 +190,14 @@ function displayQueue(index, array, queue, $button){
 				$element2 = $('.sorttable tr:eq(' + index + ') td:eq('+(event[2]+1)+')');
 				$element2.css("background-color", "yellow");
 			} else if (event[0]=="swap"){
-				var p1 = array[event[1]];
-				var p2 = array[event[2]];
-				array[event[1]] = p2;
-				array[event[2]] = p1;
-				$element1 = $('.sorttable tr:eq(' + index + ') td:eq('+(event[1]+1)+')');
+				var p1 = event[1];
+				var p2 = event[2];
+				var temp = array[p1];
+				array[p1] = array[p2];
+				array[p2] = temp;
+				$element1 = $('.sorttable tr:eq(' + index + ') td:eq('+(p1+1)+')');
 				$element1.css("background-color", "blue");
-				$element2 = $('.sorttable tr:eq(' + index + ') td:eq('+(event[2]+1)+')');
+				$element2 = $('.sorttable tr:eq(' + index + ') td:eq('+(p2+1)+')');
 				$element2.css("background-color", "blue");
 			}
 			if (queue.length == 0){

@@ -4,6 +4,7 @@ var pokemonToSort = [];
 var pokemonjson;
 
 function getRandomPokemon(array){
+	pokemonToSort = [];
 	var pickedindecies = [];
 	for (var i = 0; i<14; i++){
 		var index = parseInt(Math.random()*array.length);
@@ -28,6 +29,7 @@ function containsHeight(a, h){
 }
 
 function setTableRow(array, row){
+	row++;
 	for (var i = 0; i<array.length; i++){
 		$element = $('.sorttable tr:eq(' + row + ') td:eq('+(i+1)+')');
 		var name = array[i].species.name;
@@ -146,6 +148,29 @@ function setEventHandlers(){
 			$button4.click();
 		}
 	});
+	$button6 = $("#new");
+	$button6.click(function(){
+		for (var i = 1; i<6; i++){
+			for (var j = 1; j<15; j++){
+				$element = $('.sorttable tr:eq(' + i + ') td:eq('+j+')');
+				$element.html('');
+				$element.css('background-color', 'white');
+			}
+		}
+		getRandomPokemon(pokemonjson);
+		$button1.removeClass("green");
+		$button1.removeClass("orange");
+		$button1.addClass("red");
+		$button2.removeClass("green");
+		$button2.removeClass("orange");
+		$button2.addClass("red");
+		$button3.removeClass("green");
+		$button3.removeClass("orange");
+		$button3.addClass("red");
+		$button4.removeClass("green");
+		$button4.removeClass("orange");
+		$button4.addClass("red");
+	});
 }
 
 function quickSort(queue, array, left, right){
@@ -179,8 +204,9 @@ function partition(queue, array, left, right){
 }
 
 function displayQueue(index, array, queue, $button){
+	index++;
 	var t = setInterval(function(){
-			setTableRow(array, index);
+			setTableRow(array, index-1);
 			var event = queue.shift();
 			if (event[0]=="compare"){
 				var p1 = array[event[1]];
@@ -202,7 +228,7 @@ function displayQueue(index, array, queue, $button){
 			}
 			if (queue.length == 0){
 				clearInterval(t)
-				setTableRow(array, index);
+				setTableRow(array, index-1);
 				$button.removeClass("orange");
 				$button.addClass("green");
 			}
